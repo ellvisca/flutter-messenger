@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/screens/login_screen.dart';
 import 'package:fluttermessenger/screens/welcome_screen.dart';
 import 'package:fluttermessenger/screens/chat_screen.dart';
 
@@ -13,6 +14,7 @@ class Messenger extends StatelessWidget {
       routes:{
         WelcomeScreen.id: (context) => WelcomeScreen(),
         ChatScreen.id: (context) => ChatScreen(),
+        LoginScreen.id: (context) => LoginScreen(),
       },
     );
   }
