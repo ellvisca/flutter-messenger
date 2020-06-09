@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'chat_screen.dart';
 import 'login_screen.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 

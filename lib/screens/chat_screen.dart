@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+//final uri = 'ws://localhost:8000/ws';
+final uri = 'ws://echo.websocket.org';
+WebSocketChannel channel;
+TextEditingController controller;
+final List<MessageBubble> messageBubbles = [];
+final List<String> list = [];
 
 class ChatScreen extends StatefulWidget {
   static String id = 'chat_screen';
@@ -8,8 +17,25 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  String messageText;
+
+  ScrollController _scrollController = ScrollController();
+
+  _scrollToBottom() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    channel = IOWebSocketChannel.connect(uri);
+    controller = TextEditingController();
+    channel.stream.listen((data) => setState(() => list.add(data)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     return Scaffold(
       appBar: AppBar(
         leading: null,
@@ -20,6 +46,17 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Expanded(
+              child: ListView(
+                controller: _scrollController,
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+                children: list
+                    .map((data) => MessageBubble(
+                  client: 'asd', text: data, isMe: true,
+                ))
+                    .toList(),
+              ),
+            ),
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -32,7 +69,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
-                      onChanged: (value) {},
+                      controller: controller,
+                      onChanged: (value) {
+                        messageText = value;
+                      },
                       style: TextStyle(
                         color: Colors.black,
                       ),
@@ -41,30 +81,17 @@ class _ChatScreenState extends State<ChatScreen> {
                         hintStyle: TextStyle(
                           color: Colors.grey,
                         ),
-                        contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(0.0)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide:
-                          BorderSide(color: Colors.orangeAccent, width: 1.0),
-                          borderRadius: BorderRadius.all(Radius.circular(0.0)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                          BorderSide(color: Colors.orangeAccent, width: 2.0),
-                          borderRadius: BorderRadius.all(Radius.circular(0.0)),
-                        ),
                       ),
                     ),
                   ),
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      sendMessage();
+                      controller.clear();
+                    },
                     child: Text(
                       'Send',
                       style: TextStyle(color: Colors.black),
-
                     ),
                   ),
                 ],
@@ -72,6 +99,71 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void sendMessage() {
+    if (controller.text.isNotEmpty) {
+      channel.sink.add(controller.text);
+//      controller.text = '';
+    }
+  }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  MessageBubble({this.client, this.text, this.isMe});
+
+  final String client;
+  final String text;
+  final bool isMe;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Column(
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            client,
+            style: TextStyle(
+              fontSize: 12.0,
+              color: Colors.black54,
+            ),
+          ),
+          Material(
+            borderRadius: isMe
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(30.0),
+                    bottomLeft: Radius.circular(30.0),
+                    bottomRight: Radius.circular(30.0))
+                : BorderRadius.only(
+                    topRight: Radius.circular(30.0),
+                    bottomLeft: Radius.circular(30.0),
+                    bottomRight: Radius.circular(30.0),
+                  ),
+            elevation: 5.0,
+            color: isMe ? Colors.deepOrangeAccent : Colors.white,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: isMe ? Colors.white : Colors.black,
+                  fontSize: 15.0,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

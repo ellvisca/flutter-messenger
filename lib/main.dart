@@ -3,9 +3,9 @@ import 'package:fluttermessenger/screens/login_screen.dart';
 import 'package:fluttermessenger/screens/welcome_screen.dart';
 import 'package:fluttermessenger/screens/chat_screen.dart';
 
-void main() => runApp(Messenger());
+void main() => runApp(MyApp());
 
-class Messenger extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
