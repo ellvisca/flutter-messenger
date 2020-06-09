@@ -9,6 +9,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String username;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,18 +21,20 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Hero(
-              tag: 'logo',
-              child: Container(
-                height: 150.0,
-                child: Image.asset('images/logo.png'),
+            Flexible(
+              child: Hero(
+                tag: 'logo',
+                child: Container(
+                  height: 150.0,
+                  child: Image.asset('images/logo.png'),
+                ),
               ),
             ),
             TextField(
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black,),
               onChanged: (value) {
-
+                username = value;
               },
               decoration: InputDecoration(
                 hintText: 'Enter your username',
