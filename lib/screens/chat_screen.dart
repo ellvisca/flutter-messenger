@@ -12,6 +12,13 @@ final List<String> list = [];
 class ChatScreen extends StatefulWidget {
   static String id = 'chat_screen';
 
+  final userNameHolder;
+
+  ChatScreen({
+    Key key,
+    @required this.userNameHolder,
+  }) : super(key: key);
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -20,7 +27,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String messageText;
 
   ScrollController _scrollController = ScrollController();
-
   _scrollToBottom() {
     _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
   }
@@ -52,8 +58,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
                 children: list
                     .map((data) => MessageBubble(
-                  client: 'asd', text: data, isMe: true,
-                ))
+                          client: widget.userNameHolder,
+                          text: data,
+                          isMe: true,
+                        ))
                     .toList(),
               ),
             ),
@@ -106,7 +114,6 @@ class _ChatScreenState extends State<ChatScreen> {
   void sendMessage() {
     if (controller.text.isNotEmpty) {
       channel.sink.add(controller.text);
-//      controller.text = '';
     }
   }
 
