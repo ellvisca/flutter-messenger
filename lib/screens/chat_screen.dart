@@ -8,6 +8,7 @@ WebSocketChannel channel;
 TextEditingController controller;
 final List<MessageBubble> messageBubbles = [];
 final List<String> list = [];
+final List<Message> messages = [];
 
 class ChatScreen extends StatefulWidget {
   static String id = 'chat_screen';
@@ -36,8 +37,17 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     channel = IOWebSocketChannel.connect(uri);
     controller = TextEditingController();
-    channel.stream.listen((data) => setState(() => list.add(data)));
-  }
+    channel.stream.listen((data) {
+      setState(() {
+        list.add(data);
+        messages.add(Message(client: widget.userNameHolder, text: data));
+//        list
+//            .map((data) => Message(
+//          client: widget.userNameHolder,
+//          text: data,
+//        ));
+      });
+    });}
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +66,11 @@ class _ChatScreenState extends State<ChatScreen> {
               child: ListView(
                 controller: _scrollController,
                 padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-                children: list
+                children: messages
                     .map((data) => MessageBubble(
-                          client: widget.userNameHolder,
-                          text: data,
-                          isMe: true,
+                          client: data.client,
+                          text: data.text,
+                          isMe: data.client == widget.userNameHolder,
                         ))
                     .toList(),
               ),
@@ -174,4 +184,14 @@ class MessageBubble extends StatelessWidget {
       ),
     );
   }
+}
+
+class Message {
+  final String text;
+  final String client;
+
+  Message({
+    this.text,
+    this.client,
+  });
 }
