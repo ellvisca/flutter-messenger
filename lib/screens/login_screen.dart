@@ -9,7 +9,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String username;
+  final userName = TextEditingController();
+
+  getItemAndNavigate(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ChatScreen(
+                userNameHolder: userName.text,
+              )),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +42,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextField(
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black,),
+              style: TextStyle(
+                color: Colors.black,
+              ),
               onChanged: (value) {
-                username = value;
+                userName.text = value;
               },
               decoration: InputDecoration(
                 hintText: 'Enter your username',
@@ -42,18 +54,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.grey,
                 ),
                 contentPadding:
-                EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(32.0)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide:
-                  BorderSide(color: Colors.orangeAccent, width: 1.0),
+                      BorderSide(color: Colors.orangeAccent, width: 1.0),
                   borderRadius: BorderRadius.all(Radius.circular(32.0)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide:
-                  BorderSide(color: Colors.orangeAccent, width: 2.0),
+                      BorderSide(color: Colors.orangeAccent, width: 2.0),
                   borderRadius: BorderRadius.all(Radius.circular(32.0)),
                 ),
               ),
@@ -66,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 elevation: 5.0,
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, ChatScreen.id);
+                    getItemAndNavigate(context);
                   },
                   minWidth: 200.0,
                   height: 42.0,
