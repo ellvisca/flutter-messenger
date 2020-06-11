@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-//final uri = 'ws://localhost:8000/ws';
-final uri = 'ws://echo.websocket.org';
+final url = 'ws://35.186.145.124/ws';
+
 WebSocketChannel channel;
 TextEditingController controller;
 final List<MessageBubble> messageBubbles = [];
@@ -35,19 +35,17 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    channel = IOWebSocketChannel.connect(uri);
+    channel = WebSocketChannel.connect(Uri.parse(url));
     controller = TextEditingController();
     channel.stream.listen((data) {
       setState(() {
         list.add(data);
-        messages.add(Message(client: widget.userNameHolder, text: data));
-//        list
-//            .map((data) => Message(
-//          client: widget.userNameHolder,
-//          text: data,
-//        ));
+        messages.add(Message(
+            client: jsonDecode(data)['client'],
+            text: jsonDecode(data)['text']));
       });
-    });}
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +121,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void sendMessage() {
     if (controller.text.isNotEmpty) {
-      channel.sink.add(controller.text);
+      channel.sink.add(jsonEncode({
+        'client': widget.userNameHolder,
+        'text': controller.text,
+      }));
     }
   }
 
